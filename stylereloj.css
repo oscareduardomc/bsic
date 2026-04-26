@@ -1,0 +1,147 @@
+/* Estilos del Contenedor Principal */
+#loader-wrapper {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #0a0a0a;
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease-out, visibility 0.8s;
+}
+
+/* La Caja del Reloj (Fondo Visto) */
+.watch-caseback {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: #111;
+    border: 10px solid #2c2c2c; /* Bisel de acero */
+    box-shadow: 
+        inset 0 0 40px #000,
+        0 15px 35px rgba(0,0,0,0.9),
+        0 0 0 2px #3d3d3d; /* Brillo del borde */
+    overflow: hidden;
+}
+
+/* Placa del Movimiento (Fondo con rubíes y engranajes) */
+.movement-plate {
+    position: absolute;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle, #222 10%, #050505 90%);
+}
+
+.gear {
+    position: absolute;
+    border: 2px dashed #b8860b; /* Bronce/Oro */
+    border-radius: 50%;
+    opacity: 0.25;
+    animation: gear-rotation linear infinite;
+}
+.g1 { width: 80px; height: 80px; top: 10%; left: 15%; animation-duration: 12s; }
+.g2 { width: 50px; height: 50px; bottom: 15%; right: 20%; animation-duration: 6s; animation-direction: reverse; }
+
+.jewel {
+    position: absolute;
+    width: 10px; height: 10px;
+    background: radial-gradient(circle at 30% 30%, #ff5f5f, #800000);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 50, 50, 0.4);
+    border: 1px solid rgba(0,0,0,0.3);
+}
+.j1 { top: 40px; right: 70px; }
+.j2 { bottom: 65px; left: 45px; }
+
+/* Ensamblaje del Rotor (Masa Oscilante) */
+.rotor-assembly {
+    position: absolute;
+    width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    /* La curva cubic-bezier simula la gravedad real */
+    animation: automatic-rotor 4.5s cubic-bezier(0.68, -0.1, 0.27, 1.15) infinite;
+    transform-origin: center center;
+}
+
+.rotor-weight {
+    position: absolute;
+    bottom: 8px;
+    width: 200px;
+    height: 100px;
+    background: linear-gradient(180deg, #888 0%, #333 100%);
+    border-radius: 0 0 100px 100px;
+    border: 1px solid #555;
+    display: flex; justify-content: center; align-items: center;
+    overflow: hidden;
+    box-shadow: inset 0 -4px 10px rgba(255,255,255,0.1), 0 5px 15px rgba(0,0,0,0.5);
+}
+
+/* Textura Côtes de Genève mejorada */
+.rotor-weight::before {
+    content: '';
+    position: absolute;
+    width: 200%; height: 200%;
+    background: repeating-linear-gradient(
+        transparent,
+        transparent 8px,
+        rgba(255,255,255,0.03) 8px,
+        rgba(255,255,255,0.03) 16px
+    );
+    transform: rotate(-25deg);
+}
+
+/* Marca BSIC grabada */
+.brand-text {
+    font-family: 'Trebuchet MS', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    color: #c0c0c0; /* Plata */
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    z-index: 2;
+    /* Efecto de bajorrelieve metálico */
+    text-shadow: 
+        -1px -1px 1px #000, 
+        1px 1px 1px rgba(255,255,255,0.3);
+}
+
+/* Rulemán Central (Bearing) */
+.bearing-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 38px; height: 38px;
+    background: #444;
+    border-radius: 50%;
+    border: 3px solid #1a1a1a;
+    z-index: 10;
+    display: flex; justify-content: center; align-items: center;
+}
+
+.bearing-center::after {
+    content: '';
+    width: 20px; height: 20px;
+    background: #666;
+    border-radius: 50%;
+    box-shadow: inset 0 2px 5px #000;
+}
+
+/* Animaciones */
+@keyframes gear-rotation {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes automatic-rotor {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(210deg); } /* Cae con fuerza */
+    40% { transform: rotate(160deg); } /* Rebota */
+    55% { transform: rotate(180deg); } /* Se estabiliza abajo */
+    75% { transform: rotate(540deg); } /* Giro de carga completo */
+    100% { transform: rotate(720deg); } /* Vuelve a posición inicial */
+}
+
+/* Clase para ocultar el loader */
+.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
