@@ -1,0 +1,2712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bsic. — Relojes & Perfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   CSS VARIABLES & RESET
+   ============================================ */
+:root {
+  --black: #080808;
+  --dark: #0f0f0f;
+  --card: #141414;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+  --text: #e8e4dc;
+  --muted: #6b6560;
+  --gold: #c9a96e;
+  --gold-light: #e8c98a;
+  --gold-dark: #8a6e3a;
+  --white: #f5f1eb;
+  --red: #c0392b;
+  --font-display: 'Montserrat', sans-serif;
+  --font-ui: 'Montserrat', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
+  --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-fast: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+ul { list-style: none; }
+
+
+
+.brand-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none; /* 🔥 esto es lo importante */
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.brand-modal-content {
+  background: #111;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.brand-modal h2 {
+  margin-bottom: 20px;
+}
+
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.brand-item {
+  background: #1a1a1a;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, border 0.2s;
+  border: 1px solid transparent;
+}
+
+.brand-item img {
+  width: 100%;
+  height: 40px;
+  object-fit: contain;
+}
+
+.brand-item:hover {
+  transform: scale(1.05);
+  border-color: gold;
+}
+
+.skip-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text);
+  cursor: pointer;
+}
+/* ============================================
+   LOADER
+   ============================================ */
+    /* ---------- LOADER OVERLAY (úsalo como overlay de pantalla completa) ---------- */
+    #bsic-loader {
+      position: fixed;       /* cambia a 'absolute' si lo quieres dentro de un contenedor */
+      inset: 0;
+      background: rgba(10, 10, 20, 0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(6px);
+    }
+
+    /* ---------- STAGE ---------- */
+    .watch-stage {
+      position: relative;
+      width: 280px;
+      height: 280px;
+    }
+
+    .watch-stage svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* ---------- ANIMACIONES ---------- */
+
+    /* Rotor: oscila como en un reloj automático real */
+    @keyframes rotor-swing {
+      0%   { transform: rotate(-145deg); }
+      40%  { transform: rotate(145deg); }
+      100% { transform: rotate(-145deg); }
+    }
+
+    /* Rueda de balance: oscila rápido */
+    @keyframes balance {
+      0%   { transform: rotate(-160deg); }
+      50%  { transform: rotate(160deg); }
+      100% { transform: rotate(-160deg); }
+    }
+
+    /* Escape wheel: avanza en pasos (tick-tock) */
+    @keyframes escape-step {
+      0%   { transform: rotate(0deg); }
+      8%   { transform: rotate(8deg); }
+      10%  { transform: rotate(8deg); }
+      18%  { transform: rotate(16deg); }
+      20%  { transform: rotate(16deg); }
+      28%  { transform: rotate(24deg); }
+      30%  { transform: rotate(24deg); }
+      38%  { transform: rotate(32deg); }
+      40%  { transform: rotate(32deg); }
+      48%  { transform: rotate(40deg); }
+      50%  { transform: rotate(40deg); }
+      58%  { transform: rotate(48deg); }
+      60%  { transform: rotate(48deg); }
+      68%  { transform: rotate(56deg); }
+      70%  { transform: rotate(56deg); }
+      78%  { transform: rotate(64deg); }
+      80%  { transform: rotate(64deg); }
+      88%  { transform: rotate(72deg); }
+      90%  { transform: rotate(72deg); }
+      98%  { transform: rotate(80deg); }
+      100% { transform: rotate(80deg); }
+    }
+
+    @keyframes gear-cw  { to { transform: rotate(360deg);  } }
+    @keyframes gear-ccw { to { transform: rotate(-360deg); } }
+
+    .g-rotor   { transform-origin: 160px 160px; animation: rotor-swing 3.2s cubic-bezier(.4,0,.6,1) infinite; }
+    .g-balance { transform-origin: 230px 200px; animation: balance 0.5s linear infinite; }
+    .g-escape  { transform-origin: 210px 165px; animation: escape-step 5s steps(1,end) infinite; }
+    .g-center  { transform-origin: 160px 160px; animation: gear-cw   6s   linear infinite; }
+    .g-third   { transform-origin: 120px 130px; animation: gear-ccw  4.2s linear infinite; }
+    .g-fourth  { transform-origin: 185px 105px; animation: gear-cw   3.1s linear infinite; }
+    .g-barrel  { transform-origin: 105px 185px; animation: gear-ccw  12s  linear infinite; }
+
+    /* ---------- BRAND ---------- */
+    .brand-wrap {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: 0.38em;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: #C9A84C;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* ---------- DOTS ---------- */
+    .dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #C9A84C;
+      animation: dot-pulse 1.4s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-pulse {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+      40%            { opacity: 1;   transform: scale(1.3); }
+    }
+  
+/* ============================================
+   NAV
+   ============================================ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.4s, padding 0.4s, backdrop-filter 0.4s;
+}
+nav.scrolled {
+  background: rgba(8,8,8,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--font-ui);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--white);
+}
+.nav-logo span { color: var(--gold); }
+.nav-links {
+  display: flex;
+  gap: 36px;
+  align-items: center;
+}
+.nav-links a {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color var(--transition-fast);
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 1px;
+  background: var(--gold);
+  transition: width var(--transition);
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-links a:hover::after { width: 100%; }
+.nav-actions { display: flex; gap: 20px; align-items: center; }
+.nav-cart {
+  position: relative;
+  width: 40px; height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border2);
+  border-radius: 50%;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.nav-cart:hover { border-color: var(--gold); transform: scale(1.05); }
+.nav-cart svg { width: 18px; height: 18px; stroke: var(--text); fill: none; stroke-width: 1.5; }
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+}
+.hamburger span {
+  display: block;
+  width: 22px; height: 1.5px;
+  background: var(--text);
+  transition: all 0.3s;
+}
+
+/* ============================================
+   MOBILE MENU
+   ============================================ */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  background: var(--black);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.mobile-menu.open { opacity: 1; pointer-events: all; }
+.mobile-menu a {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+}
+.mobile-menu a:hover { color: var(--gold); }
+.mobile-menu-close {
+  position: absolute;
+  top: 28px; right: 32px;
+  font-size: 28px;
+  color: var(--muted);
+  transition: color 0.3s;
+}
+.mobile-menu-close:hover { color: var(--gold); }
+
+
+@keyframes gridMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(60px); }
+}
+
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  background: var(--gold);
+  color: var(--black);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gold-light);
+  transform: translateX(-100%);
+  transition: transform var(--transition);
+}
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-primary span { position: relative; z-index: 1; }
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 28px;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: all var(--transition);
+}
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+
+
+@keyframes ringPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.03); opacity: 0.6; }
+}
+
+
+.scroll-line {
+  width: 1px; height: 50px;
+  background: linear-gradient(to bottom, var(--muted), transparent);
+  animation: scrollAnim 2s ease-in-out infinite;
+}
+@keyframes scrollAnim {
+  0% { transform: scaleY(0); transform-origin: top; opacity: 1; }
+  50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+/* ============================================
+   BRANDS MARQUEE
+   ============================================ */
+.brands-section {
+  padding: 48px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+}
+
+.brands-section::before,
+.brands-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  z-index: 2;
+}
+
+.brands-section::before {
+  left: 0;
+  background: linear-gradient(to right, var(--black), transparent);
+}
+
+.brands-section::after {
+  right: 0;
+  background: linear-gradient(to left, var(--black), transparent);
+}
+
+.brands-track {
+  display: flex;
+  gap: 72px;
+  align-items: center;
+  animation: marquee 25s linear infinite;
+  width: max-content;
+}
+
+.brands-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* 🔥 AQUÍ ESTÁ EL ARREGLO */
+.brand-logo {
+  height: 40px;        /* tamaño más pequeño */
+  width: auto;
+  max-width: 120px;    /* evita logos muy grandes */
+  object-fit: contain;
+  opacity: 0.7;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+/* ============================================
+   SECTION COMMONS
+   ============================================ */
+.section-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+.section-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.5em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1.1;
+}
+.section-title em { font-style: italic; color: var(--gold); }
+
+/* ============================================
+   CATALOG SECTION
+   ============================================ */
+#catalog {
+  padding: 100px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Filters */
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+   position: relative;
+  z-index: 200;
+}
+
+.filters-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.filter-group {
+  position: relative;
+    z-index: 300;
+
+}
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid var(--border2);
+  background: var(--card);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all var(--transition-fast);
+}
+.filter-btn:hover, .filter-btn.active { border-color: var(--gold); color: var(--gold); }
+.filter-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; transition: transform 0.3s; }
+.filter-btn.open svg { transform: rotate(180deg); }
+.filter-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: #161616;
+  border: 1px solid var(--border2);
+  min-width: 200px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: all 0.25s;
+}
+.filter-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  transition: all 0.2s;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.filter-option:last-child { border-bottom: none; }
+.filter-option:hover, .filter-option.selected { color: var(--gold); background: rgba(201,169,110,0.05); }
+.filter-option input[type="checkbox"] {
+  width: 14px; height: 14px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+.filter-option input[type="checkbox"]:checked {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.filter-option input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  color: var(--black);
+  font-size: 10px;
+  top: -1px;
+  left: 2px;
+}
+
+.price-range {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.price-inputs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.price-inputs input {
+  width: 80px;
+  padding: 8px 10px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+.price-inputs span {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.filters-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.sort-select {
+  padding: 10px 18px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6560' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+.sort-select:focus { outline: none; border-color: var(--gold); color: var(--gold); }
+
+.results-count {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.results-count span { color: var(--gold); }
+
+/* Active filters chips */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(201,169,110,0.1);
+  border: 1px solid rgba(201,169,110,0.3);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  animation: chipIn 0.3s ease;
+}
+@keyframes chipIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.filter-chip button {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: rgba(201,169,110,0.2);
+  color: var(--gold);
+  font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.filter-chip button:hover { background: rgba(201,169,110,0.4); }
+
+/* Grid */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* Cards */
+.product-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  transition: transform var(--transition), border-color var(--transition);
+  opacity: 0;
+  transform: translateY(24px);
+}
+.product-card.visible {
+  animation: cardReveal 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+@keyframes cardReveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+.product-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-4px);
+}
+
+.card-badge {
+  position: absolute;
+  top: 16px; left: 16px;
+  z-index: 3;
+  padding: 4px 12px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.badge-new { background: var(--gold); color: var(--black); }
+.badge-sale { background: var(--red); color: var(--white); }
+.badge-limited { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+
+.card-img-wrap {
+  position: relative;
+  padding-top: 100%; /* Ajuste para proporción cuadrada */
+  overflow: hidden;
+  background: #0c0c0c;
+}
+.card-img-wrap img.watch-img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.product-card:hover .card-img-wrap img.watch-img {
+  transform: scale(1.06);
+}
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(8,8,8,0.5);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--transition);
+}
+.product-card:hover .card-overlay { opacity: 1; }
+.card-overlay-btn {
+  padding: 12px 28px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  transform: translateY(8px);
+  transition: all 0.3s;
+  background: transparent;
+}
+.product-card:hover .card-overlay-btn { transform: translateY(0); background: rgba(201,169,110,0.1); }
+.card-overlay-btn:hover { background: var(--gold) !important; color: var(--black) !important; }
+
+.card-body { padding: 20px; }
+.card-brand {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.card-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+.card-type {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.card-price {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.05em;
+}
+.card-price-old {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: line-through;
+  margin-left: 8px;
+}
+.card-stars {
+  display: flex;
+  gap: 2px;
+}
+.star { font-size: 12px; color: var(--gold); }
+.star.empty { color: var(--border2); }
+.card-rating-count {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+/* No results */
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  display: none;
+}
+.no-results.show { display: block; }
+.no-results-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.3; }
+.no-results p {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--muted);
+}
+
+/* ============================================
+   PRODUCT MODAL
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+  overflow-y: auto;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal {
+  position: relative;
+  max-width: 1100px;
+  margin: 40px auto;
+  background: var(--dark);
+  border: 1px solid var(--border);
+  transform: translateY(30px) scale(0.97);
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-height: 80vh;
+}
+.modal-overlay.open .modal {
+  transform: translateY(0) scale(1);
+}
+.modal-close {
+  position: absolute;
+  top: 20px; right: 20px;
+  z-index: 10;
+  width: 40px; height: 40px;
+  border: 1px solid var(--border2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  font-size: 20px;
+  transition: all 0.2s;
+}
+.modal-close:hover { border-color: var(--gold); color: var(--gold); transform: rotate(90deg); }
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 80vh;
+}
+.modal-img-side {
+  background: #0c0c0c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.modal-img-side::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(201,169,110,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.modal-watch-display {
+  width: 100%;
+  max-width: 400px;
+  animation: modalWatchIn 0.8s 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  position: relative;
+  z-index: 2;
+}
+.modal-watch-display img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 500px;
+}
+@keyframes modalWatchIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-img-thumbnails {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+  z-index: 2;
+}
+.thumb {
+  width: 60px; height: 60px;
+  border: 2px solid var(--border2);
+  background: var(--card);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s;
+  overflow: hidden;
+  cursor: pointer;
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumb.active, .thumb:hover { border-color: var(--gold); }
+
+.modal-info-side {
+  padding: 48px 48px 48px 40px;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+.modal-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  animation: fadeUp 0.5s 0.2s both;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--white);
+  margin-bottom: 8px;
+  animation: fadeUp 0.5s 0.3s both;
+}
+.modal-subtitle {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  animation: fadeUp 0.5s 0.35s both;
+}
+.modal-rating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  animation: fadeUp 0.5s 0.4s both;
+}
+.modal-stars { display: flex; gap: 3px; }
+.modal-star { font-size: 15px; color: var(--gold); }
+.modal-star.empty { color: var(--border2); }
+.modal-rating-text {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.modal-price-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 28px;
+  animation: fadeUp 0.5s 0.45s both;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.modal-price {
+  font-family: var(--font-ui);
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+}
+.modal-price-old {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.modal-savings {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--red);
+  letter-spacing: 0.1em;
+}
+.modal-desc {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 28px;
+  animation: fadeUp 0.5s 0.5s both;
+}
+
+.modal-specs {
+  margin-bottom: 32px;
+  animation: fadeUp 0.5s 0.55s both;
+}
+.modal-specs-title {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+.spec-item {
+  background: var(--card);
+  padding: 12px 16px;
+}
+.spec-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.spec-value {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 36px;
+  animation: fadeUp 0.5s 0.6s both;
+}
+.btn-whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px;
+  background: #25d366;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-whatsapp::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+}
+.btn-whatsapp:hover::before { transform: translateX(0); }
+.btn-whatsapp svg { width: 20px; height: 20px; fill: white; }
+.btn-wishlist {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+.btn-wishlist:hover { border-color: var(--gold); color: var(--gold); }
+.btn-wishlist svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+
+/* Reviews */
+.modal-reviews { animation: fadeUp 0.5s 0.65s both; }
+.reviews-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.reviews-title {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.reviews-avg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reviews-avg-num {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--white);
+  font-weight: 400;
+}
+.review-card {
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.review-card:hover { border-color: var(--border2); }
+.review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.reviewer-info { display: flex; align-items: center; gap: 12px; }
+.reviewer-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--black);
+}
+.reviewer-name {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+.reviewer-date {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--muted);
+}
+.review-stars { display: flex; gap: 2px; }
+.review-text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.review-verified {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: #25d366;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================
+   FEATURES SECTION
+   ============================================ */
+.features-section {
+  padding: 0px 32px;
+  background: var(--dark);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.features-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.feature-item {
+  background: var(--dark);
+  padding: 40px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  transition: background 0.3s;
+}
+.feature-item:hover { background: var(--card); }
+.feature-icon {
+  width: 48px; height: 48px;
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.3s;
+}
+.feature-item:hover .feature-icon { border-color: var(--gold); }
+.feature-icon svg { width: 22px; height: 22px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+.feature-text h4 {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.feature-text p {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+footer {
+  padding: 60px 64px 32px;
+  border-top: 1px solid var(--border);
+  max-width: 100%;
+}
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 48px;
+}
+.footer-logo {
+  font-family: var(--font-ui);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+.footer-logo span { color: var(--gold); }
+.footer-tagline {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 260px;
+  margin-bottom: 28px;
+}
+.footer-social { display: flex; gap: 12px; }
+.social-link {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  transition: all 0.2s;
+}
+.social-link:hover { border-color: var(--gold); color: var(--gold); }
+.footer-col h5 {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.footer-col ul { display: flex; flex-direction: column; gap: 10px; }
+.footer-col li a {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.footer-col li a:hover { color: var(--gold); }
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-copy {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.footer-copy span { color: var(--gold); }
+
+/* ============================================
+   WHATSAPP FLOATING
+   ============================================ */
+.whatsapp-float {
+  position: fixed;
+  bottom: 32px; right: 32px;
+  z-index: 500;
+  width: 56px; height: 56px;
+  background: #25d366;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  animation: waPulse 2s ease-in-out infinite;
+  transition: transform 0.2s;
+}
+.whatsapp-float:hover { transform: scale(1.1); }
+.whatsapp-float svg { width: 28px; height: 28px; fill: white; }
+@keyframes waPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
+  50% { box-shadow: 0 4px 40px rgba(37, 211, 102, 0.7); }
+}
+
+/* ============================================
+   SCROLL REVEAL
+   ============================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ============================================
+   TOAST
+   ============================================ */
+.toast {
+  position: fixed;
+  bottom: 100px; right: 32px;
+  background: var(--card);
+  border: 1px solid var(--gold);
+  padding: 16px 24px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  z-index: 9999;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.4s;
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+
+  .modal-grid { grid-template-columns: 1fr; }
+  .modal-img-side { min-height: 300px; padding: 40px; }
+  .modal-info-side { max-height: none; padding: 32px; }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .features-inner { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  nav { padding: 16px 20px; }
+  nav.scrolled { padding: 12px 20px; }
+  .filter-dropdown {
+    position: fixed;  
+    left: 16px;
+    right: 16px;
+    top: auto;
+    bottom: 80px;      
+    width: auto;
+    min-width: unset;
+    z-index: 9999;
+    border-radius: 12px;
+  }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+
+  #catalog { padding: 60px 16px; }
+  .filters-bar { flex-direction: column; align-items: stretch;  z-index: 500; gap: 16px;}
+  .filters-left { display: flex;
+    overflow-x: auto;}
+  .filter-btn {
+    white-space: nowrap;
+    min-width: max-content; /* 🔥 clave */
+  }
+  .filters-right { justify-content: flex-end; }
+  .catalog-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .modal { margin: 0; min-height: 100vh; border: none; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .modal-info-side { padding: 24px; }
+  .modal-title { font-size: 28px; }
+  footer { padding: 40px 24px 24px; }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+  .spec-grid { grid-template-columns: 1fr; }
+  .card-stars{display: none;}
+  .card-rating-count{display: none;}
+
+
+}
+@media (max-width: 480px) {
+  /* .catalog-grid { grid-template-columns: 1fr; } */
+  .card-stars{display: none;}
+  .card-rating-count{display: none;}
+  .footer-inner { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="bsic-loader">
+
+    <div class="watch-stage">
+      <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="plateBg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#1f2040"/>
+            <stop offset="100%" stop-color="#0e0f1f"/>
+          </radialGradient>
+          <radialGradient id="gearGold" cx="40%" cy="35%" r="60%">
+            <stop offset="0%"   stop-color="#E8CC7A"/>
+            <stop offset="100%" stop-color="#8B6914"/>
+          </radialGradient>
+          <radialGradient id="gearSilver" cx="40%" cy="35%" r="60%">
+            <stop offset="0%"   stop-color="#E0E0E8"/>
+            <stop offset="100%" stop-color="#606070"/>
+          </radialGradient>
+          <radialGradient id="rotorGrad" cx="60%" cy="30%" r="70%">
+            <stop offset="0%"   stop-color="#D4A84B" stop-opacity="0.95"/>
+            <stop offset="70%"  stop-color="#7A5A10" stop-opacity="0.88"/>
+            <stop offset="100%" stop-color="#4A3608" stop-opacity="0.85"/>
+          </radialGradient>
+          <filter id="ruby-glow">
+            <feGaussianBlur stdDeviation="1.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Plato principal -->
+        <circle cx="160" cy="160" r="148" fill="url(#plateBg)" stroke="#C9A84C" stroke-width="1.5"/>
+        <circle cx="160" cy="160" r="144" fill="none" stroke="#C9A84C" stroke-width="0.4" stroke-dasharray="4 3" opacity="0.4"/>
+        <circle cx="160" cy="160" r="130" fill="none" stroke="#2a2a50" stroke-width="0.5"/>
+        <circle cx="160" cy="160" r="90"  fill="none" stroke="#2a2a50" stroke-width="0.5"/>
+
+        <!-- Puentes (bridges) -->
+        <rect x="72"  y="155" width="75" height="48" rx="5" fill="rgba(180,185,210,0.06)" stroke="#C9A84C" stroke-width="0.6"/>
+        <rect x="130" y="72"  width="80" height="75" rx="5" fill="rgba(180,185,210,0.06)" stroke="#C9A84C" stroke-width="0.6"/>
+        <rect x="178" y="135" width="72" height="72" rx="5" fill="rgba(180,185,210,0.06)" stroke="#C9A84C" stroke-width="0.6"/>
+
+        <!-- BARRIL -->
+        <g class="g-barrel">
+          <circle cx="105" cy="185" r="28" fill="url(#gearGold)" stroke="#C9A84C" stroke-width="0.8"/>
+          <circle cx="105" cy="185" r="24" fill="none" stroke="#7A5A10" stroke-width="0.5"/>
+          <g stroke="#C9A84C" stroke-width="1.5" fill="none">
+            <line x1="105" y1="157" x2="105" y2="151"/> <line x1="116" y1="159" x2="119" y2="153"/>
+            <line x1="124" y1="167" x2="129" y2="163"/> <line x1="126" y1="178" x2="133" y2="177"/>
+            <line x1="124" y1="189" x2="131" y2="191"/> <line x1="117" y1="198" x2="122" y2="203"/>
+            <line x1="107" y1="204" x2="109" y2="211"/> <line x1="96"  y1="205" x2="95"  y2="212"/>
+            <line x1="87"  y1="200" x2="83"  y2="206"/> <line x1="81"  y1="192" x2="75"  y2="196"/>
+            <line x1="79"  y1="182" x2="72"  y2="182"/> <line x1="81"  y1="172" x2="75"  y2="169"/>
+            <line x1="87"  y1="164" x2="83"  y2="159"/> <line x1="96"  y1="158" x2="94"  y2="151"/>
+          </g>
+          <circle cx="105" cy="185" r="6" fill="#0e0f1f" stroke="#C9A84C" stroke-width="0.8"/>
+          <circle cx="105" cy="185" r="3" fill="#cc2244" filter="url(#ruby-glow)"/>
+        </g>
+
+        <!-- RUEDA CENTRAL -->
+        <g class="g-center">
+          <circle cx="160" cy="160" r="22" fill="url(#gearSilver)" stroke="#A0A0B0" stroke-width="0.8"/>
+          <circle cx="160" cy="160" r="17" fill="none" stroke="#606070" stroke-width="0.5"/>
+          <g stroke="#C0C0CC" stroke-width="1.5" fill="none">
+            <line x1="160" y1="138" x2="160" y2="132"/> <line x1="170" y1="140" x2="173" y2="134"/>
+            <line x1="179" y1="146" x2="183" y2="141"/> <line x1="183" y1="156" x2="189" y2="154"/>
+            <line x1="182" y1="166" x2="188" y2="167"/> <line x1="176" y1="174" x2="181" y2="178"/>
+            <line x1="167" y1="179" x2="170" y2="185"/> <line x1="157" y1="181" x2="157" y2="187"/>
+            <line x1="147" y1="178" x2="144" y2="184"/> <line x1="139" y1="172" x2="135" y2="176"/>
+            <line x1="135" y1="162" x2="129" y2="164"/> <line x1="135" y1="152" x2="129" y2="151"/>
+            <line x1="140" y1="143" x2="136" y2="138"/> <line x1="149" y1="138" x2="147" y2="132"/>
+          </g>
+          <circle cx="160" cy="160" r="5.5" fill="#0e0f1f" stroke="#C0C0CC" stroke-width="0.8"/>
+          <circle cx="160" cy="160" r="2.5" fill="#cc2244" filter="url(#ruby-glow)"/>
+        </g>
+
+        <!-- TERCERA RUEDA -->
+        <g class="g-third">
+          <circle cx="120" cy="130" r="16" fill="url(#gearSilver)" stroke="#A0A0B0" stroke-width="0.6"/>
+          <circle cx="120" cy="130" r="12" fill="none" stroke="#606070" stroke-width="0.5"/>
+          <g stroke="#C0C0CC" stroke-width="1.3" fill="none">
+            <line x1="120" y1="114" x2="120" y2="110"/> <line x1="128" y1="117" x2="131" y2="113"/>
+            <line x1="133" y1="124" x2="137" y2="122"/> <line x1="133" y1="132" x2="137" y2="133"/>
+            <line x1="129" y1="139" x2="132" y2="143"/> <line x1="122" y1="143" x2="122" y2="147"/>
+            <line x1="115" y1="141" x2="112" y2="145"/> <line x1="109" y1="136" x2="105" y2="139"/>
+            <line x1="107" y1="128" x2="103" y2="128"/> <line x1="109" y1="121" x2="105" y2="118"/>
+            <line x1="115" y1="116" x2="112" y2="112"/>
+          </g>
+          <circle cx="120" cy="130" r="4" fill="#0e0f1f" stroke="#C0C0CC" stroke-width="0.6"/>
+          <circle cx="120" cy="130" r="2" fill="#cc2244" filter="url(#ruby-glow)"/>
+        </g>
+
+        <!-- CUARTA RUEDA -->
+        <g class="g-fourth">
+          <circle cx="185" cy="105" r="16" fill="url(#gearGold)" stroke="#C9A84C" stroke-width="0.6"/>
+          <circle cx="185" cy="105" r="12" fill="none" stroke="#7A5A10" stroke-width="0.5"/>
+          <g stroke="#D4B060" stroke-width="1.3" fill="none">
+            <line x1="185" y1="89"  x2="185" y2="85"/>  <line x1="193" y1="92"  x2="196" y2="88"/>
+            <line x1="198" y1="99"  x2="202" y2="97"/>  <line x1="198" y1="107" x2="202" y2="108"/>
+            <line x1="194" y1="114" x2="197" y2="118"/> <line x1="187" y1="118" x2="187" y2="122"/>
+            <line x1="180" y1="116" x2="177" y2="120"/> <line x1="174" y1="111" x2="170" y2="114"/>
+            <line x1="172" y1="103" x2="168" y2="103"/> <line x1="174" y1="96"  x2="170" y2="93"/>
+            <line x1="180" y1="91"  x2="177" y2="87"/>
+          </g>
+          <circle cx="185" cy="105" r="4" fill="#0e0f1f" stroke="#C9A84C" stroke-width="0.6"/>
+          <circle cx="185" cy="105" r="2" fill="#cc2244" filter="url(#ruby-glow)"/>
+        </g>
+
+        <!-- RUEDA DE ESCAPE -->
+        <g class="g-escape">
+          <circle cx="210" cy="165" r="14" fill="url(#gearGold)" stroke="#C9A84C" stroke-width="0.6"/>
+          <g fill="#E8CC7A" stroke="#C9A84C" stroke-width="0.4">
+            <polygon points="210,151 212,158 208,158"/> <polygon points="220,154 220,161 215,160"/>
+            <polygon points="224,163 221,169 218,165"/> <polygon points="220,173 215,177 215,172"/>
+            <polygon points="212,179 209,179 210,173"/> <polygon points="202,177 201,172 206,173"/>
+            <polygon points="197,169 200,165 202,170"/> <polygon points="197,158 202,159 200,163"/>
+            <polygon points="202,152 205,157 202,160"/>
+          </g>
+          <circle cx="210" cy="165" r="4" fill="#0e0f1f" stroke="#C9A84C" stroke-width="0.6"/>
+          <circle cx="210" cy="165" r="2" fill="#cc2244" filter="url(#ruby-glow)"/>
+        </g>
+
+        <!-- HORQUILLA + RUEDA DE BALANCE -->
+        <g class="g-balance">
+          <rect x="225" y="185" width="10" height="30" rx="2" fill="url(#gearSilver)" stroke="#A0A0B0" stroke-width="0.6"/>
+          <rect x="214" y="174" width="14" height="6" rx="1.5" fill="#C9A84C" stroke="#8B6914" stroke-width="0.5" transform="rotate(-20,221,177)"/>
+          <rect x="218" y="193" width="14" height="6" rx="1.5" fill="#C9A84C" stroke="#8B6914" stroke-width="0.5" transform="rotate(20,225,196)"/>
+          <circle cx="230" cy="200" r="18" fill="none" stroke="#C0C0CC" stroke-width="1.2"/>
+          <circle cx="230" cy="200" r="14" fill="none" stroke="#8A8A96" stroke-width="0.5" stroke-dasharray="3 2"/>
+          <line x1="230" y1="182" x2="230" y2="218" stroke="#C0C0CC" stroke-width="1"/>
+          <line x1="212" y1="200" x2="248" y2="200" stroke="#C0C0CC" stroke-width="1"/>
+          <line x1="217" y1="187" x2="243" y2="213" stroke="#C0C0CC" stroke-width="0.8"/>
+          <line x1="217" y1="213" x2="243" y2="187" stroke="#C0C0CC" stroke-width="0.8"/>
+          <circle cx="230" cy="200" r="4.5" fill="#0e0f1f" stroke="#C0C0CC" stroke-width="0.8"/>
+          <circle cx="230" cy="200" r="2"   fill="#cc2244" filter="url(#ruby-glow)"/>
+          <!-- Espiral/hairspring -->
+          <path d="M230,200 Q234,196 233,192 Q231,188 226,190 Q221,192 223,197 Q225,201 229,200"
+                fill="none" stroke="#A0A0B0" stroke-width="0.5"/>
+        </g>
+
+        <!-- ROTOR (peso oscilante — el alma del automático) -->
+        <g class="g-rotor">
+          <path d="M160,160 L160,30 A130,130 0 1,1 30,160 Z" fill="url(#rotorGrad)" stroke="#C9A84C" stroke-width="1"/>
+          <path d="M160,160 L160,55 A105,105 0 1,1 55,160 Z"  fill="#0e0f1f" stroke="none"/>
+          <path d="M160,160 L160,30 A130,130 0 1,1 30,160"    fill="none" stroke="#E8CC7A" stroke-width="2"/>
+          <text x="100" y="230" fill="#C9A84C" font-family="serif" font-size="29" opacity="0.65"
+                transform="rotate(-45,100,230)">bsic</text>
+          <circle cx="160" cy="160" r="14" fill="url(#gearGold)" stroke="#C9A84C" stroke-width="1"/>
+          <circle cx="160" cy="160" r="9"  fill="#1a1a2e"         stroke="#C9A84C" stroke-width="0.5"/>
+          <circle cx="160" cy="160" r="3.5" fill="#C9A84C"/>
+        </g>
+
+        <!-- Rubíes decorativos -->
+        <circle cx="145" cy="110" r="3" fill="#cc2244" opacity="0.8" filter="url(#ruby-glow)"/>
+        <circle cx="200" cy="130" r="3" fill="#cc2244" opacity="0.8" filter="url(#ruby-glow)"/>
+        <circle cx="95"  cy="160" r="3" fill="#cc2244" opacity="0.7" filter="url(#ruby-glow)"/>
+        <circle cx="170" cy="210" r="3" fill="#cc2244" opacity="0.7" filter="url(#ruby-glow)"/>
+
+        <!-- Caja / case ring -->
+        <circle cx="160" cy="160" r="148" fill="none" stroke="#C9A84C" stroke-width="2.5"/>
+        <circle cx="160" cy="160" r="151" fill="none" stroke="#8B6914" stroke-width="1"/>
+        <circle cx="160" cy="160" r="155" fill="none" stroke="#C9A84C" stroke-width="0.5" opacity="0.4"/>
+
+        <!-- Patas de la caja (lugs) -->
+        <rect x="151" y="4"   width="18" height="14" rx="3" fill="#8B6914" stroke="#C9A84C" stroke-width="0.6"/>
+        <rect x="151" y="302" width="18" height="14" rx="3" fill="#8B6914" stroke="#C9A84C" stroke-width="0.6"/>
+        <rect x="4"   y="151" width="14" height="18" rx="3" fill="#8B6914" stroke="#C9A84C" stroke-width="0.6"/>
+        <rect x="302" y="151" width="14" height="18" rx="3" fill="#8B6914" stroke="#C9A84C" stroke-width="0.6"/>
+      </svg>
+    </div>
+
+    <div class="brand-wrap">
+      <div class="brand-name">BSIC</div>
+      <div class="brand-sub">Swiss Automatic Movement</div>
+      <div class="dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
+  </div>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="bsic-store-loader.html" onclick="closeMobileMenu()">Inicio</a>
+  <a href="#catalog" onclick="closeMobileMenu()">Catálogo</a>
+  <a href="#brands" onclick="closeMobileMenu()">Marcas</a>
+  <a href="#" onclick="closeMobileMenu()">Nosotros</a>
+  <a href="#" onclick="openWhatsApp('general')">Contacto</a>
+</div>
+
+<nav id="mainNav">
+  <a href="#" class="nav-logo">bsic<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#">Inicio</a></li>
+    <li><a href="#catalog">Catálogo</a></li>
+    <li><a href="#brands">Marcas</a></li>
+    <li><a href="#">Nosotros</a></li>
+    <li><a href="#" onclick="openWhatsApp('general'); return false;">Contacto</a></li>
+  </ul>
+  <div class="nav-actions">
+    <!-- <a href="#" class="nav-cart" title="Carrito">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    </a> -->
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+  <span></span><span></span><span></span>
+</button>
+  </div>
+</nav>
+
+ <br><br><br><br>
+
+
+
+ 
+<section class="brands-section" id="brands">
+  <div class="brands-track" id="brandsTrack">
+   
+    <img class="brand-logo" src="Casio-Logo-Download-Free-PNG.png" alt="Seiko">
+    <img class="brand-logo" src="Bulova_Logo.png" alt="Bulova">
+    <img class="brand-logo" src="Seiko_logo_black.png" alt="Seiko">
+    <img class="brand-logo" src="G-Shock_logo_black.png" alt="G-Shock">
+    <img class="brand-logo" src="Tudor_logo.png" alt="Tudor">
+    <img class="brand-logo" src="pngegg.png" alt="Rolex">
+    <img class="brand-logo" src="Casio-Logo-Download-Free-PNG.png" alt="Casio">
+    <img class="brand-logo" src="FOSL_BIG.D-87968f86.png" alt="Fossil">
+    <img class="brand-logo" src="7762.T_BIG.D-d9c48d15.png" alt="Citizen">
+    <img class="brand-logo" src="omega.png" alt="Omega">
+    <img class="brand-logo" src="Bulova_Logo.png" alt="Bulova">
+    <img class="brand-logo" src="Seiko_logo_black.png" alt="Seiko">
+    <img class="brand-logo" src="Tudor_logo.png" alt="Tudor">
+    <img class="brand-logo" src="pngegg.png" alt="Rolex">
+    <img class="brand-logo" src="FOSL_BIG.D-87968f86.png" alt="Fossil">
+    <img class="brand-logo" src="7762.T_BIG.D-d9c48d15.png" alt="Citizen">
+
+  </div>
+</section>
+
+
+<section id="catalog">
+  <!-- <div class="section-header reveal">
+    <p class="section-eyebrow">Nuestra Colección</p>
+    <h2 class="section-title">El <em>Catálogo</em></h2>
+  </div> -->
+
+  <div class="filters-bar reveal">
+    <div class="filters-left">
+
+      <div class="filter-group" id="brandFilter">
+        <button class="filter-btn" onclick="toggleDropdown('brandDropdown', this)">
+          Marca
+          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="filter-dropdown" id="brandDropdown">
+          <label class="filter-option"><input type="checkbox" value="Seiko" onchange="applyFilters()"> Seiko</label>
+          <label class="filter-option"><input type="checkbox" value="Citizen" onchange="applyFilters()"> Citizen</label>
+          <label class="filter-option"><input type="checkbox" value="Tissot" onchange="applyFilters()"> Tissot</label>
+          <label class="filter-option"><input type="checkbox" value="Casio" onchange="applyFilters()"> Casio</label>
+          <label class="filter-option"><input type="checkbox" value="Bulova" onchange="applyFilters()"> Bulova</label>
+          <label class="filter-option"><input type="checkbox" value="Orient" onchange="applyFilters()"> Orient</label>
+          <label class="filter-option"><input type="checkbox" value="Invicta" onchange="applyFilters()"> Invicta</label>
+          <label class="filter-option"><input type="checkbox" value="Fossil" onchange="applyFilters()"> Fossil</label>
+        </div>
+      </div>
+
+      <div class="filter-group" id="typeFilter">
+        <button class="filter-btn" onclick="toggleDropdown('typeDropdown', this)">
+          Tipo
+          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="filter-dropdown" id="typeDropdown">
+          <label class="filter-option"><input type="checkbox" value="Automático" onchange="applyFilters()"> Automático</label>
+          <label class="filter-option"><input type="checkbox" value="Solar" onchange="applyFilters()"> Solar</label>
+          <label class="filter-option"><input type="checkbox" value="Cuarzo" onchange="applyFilters()"> Cuarzo</label>
+          <label class="filter-option"><input type="checkbox" value="Cronógrafo" onchange="applyFilters()"> Cronógrafo</label>
+          <label class="filter-option"><input type="checkbox" value="Digital" onchange="applyFilters()"> Digital</label>
+          <label class="filter-option"><input type="checkbox" value="Smartwatch" onchange="applyFilters()"> Smartwatch</label>
+        </div>
+      </div>
+
+      <div class="filter-group" id="priceFilter">
+        <button class="filter-btn" onclick="toggleDropdown('priceDropdown', this)">
+          Precio
+          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="filter-dropdown" id="priceDropdown">
+          <div class="price-range">
+            <div class="price-inputs">
+              <input type="number" id="priceMin" placeholder="Min" min="0" oninput="applyFilters()">
+              <span>—</span>
+              <input type="number" id="priceMax" placeholder="Máx" min="0" oninput="applyFilters()">
+            </div>
+            <label class="filter-option" style="padding:0"><input type="checkbox" value="under100" onchange="togglePricePreset(this, 0, 100)"> Menos de L. 2,500</label>
+            <label class="filter-option" style="padding:0"><input type="checkbox" value="100-300" onchange="togglePricePreset(this, 2500, 7500)"> L. 2,500 – L. 7,500</label>
+            <label class="filter-option" style="padding:0"><input type="checkbox" value="300-700" onchange="togglePricePreset(this, 7500, 17500)"> L. 7,500 – L. 17,500</label>
+            <label class="filter-option" style="padding:0"><input type="checkbox" value="over700" onchange="togglePricePreset(this, 17500, 999999)"> Más de L. 17,500</label>
+          </div>
+        </div>
+      </div>
+
+      <button class="filter-btn" id="newOnlyBtn" onclick="toggleNewOnly()">
+        Novedades
+      </button>
+
+    </div>
+    <div class="filters-right">
+      <span class="results-count"><span id="resultsCount">0</span> relojes</span>
+      <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+        <option value="featured">Destacados</option>
+        <option value="newest">Más Nuevos</option>
+        <option value="price-asc">Precio: Menor a Mayor</option>
+        <option value="price-desc">Precio: Mayor a Menor</option>
+        <option value="rating">Mejor Valorados</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="active-filters" id="activeFilters"></div>
+
+  <div class="catalog-grid" id="catalogGrid">
+    <div class="no-results" id="noResults">
+      <div class="no-results-icon">⌚</div>
+      <p>No encontramos relojes con esos filtros.</p>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand-col">
+      <div class="footer-logo">bsic<span>.</span></div>
+      <p class="footer-tagline">Relojes y perfumes para hombres que saben lo que quieren. Estilo simple, esencia fuerte.</p>
+      <div class="footer-social">
+        <a href="#" class="social-link">IG</a>
+        <a href="#" class="social-link">FB</a>
+        <a href="#" class="social-link">TK</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Tienda</h5>
+      <ul>
+        <li><a href="#catalog">Catálogo</a></li>
+        <li><a href="#">Novedades</a></li>
+        <li><a href="#">Ofertas</a></li>
+        <li><a href="#">Marcas</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Ayuda</h5>
+      <ul>
+        <li><a href="#">Guía de tallas</a></li>
+        <li><a href="#">Garantía</a></li>
+        <li><a href="#">Devoluciones</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Contacto</h5>
+      <ul>
+        <li><a href="#" onclick="openWhatsApp('general'); return false;">WhatsApp</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">info@bsic.hn</a></li>
+        <li><a href="#">San Pedro Sula, HN</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 <span>bsic.</span> Honduras. Todos los derechos reservados.</p>
+    <p class="footer-copy">Desarrollado con ♥ por Oscar Martinez</p>
+  </div>
+</footer>
+
+<a href="#" class="whatsapp-float" onclick="openWhatsApp('general'); return false;" title="Contactar por WhatsApp">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<div class="modal-overlay" id="productModal" onclick="handleModalOverlayClick(event)">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-grid">
+      <div class="modal-img-side" id="modalImgSide">
+        <div class="modal-watch-display" id="modalWatchDisplay">
+           </div>
+        <div class="modal-img-thumbnails" id="modalThumbs">
+           </div>
+      </div>
+      <div class="modal-info-side" id="modalInfoSide">
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// DATA
+// ============================================
+const WHATSAPP_NUMBER = '50499239146'; // CAMBIA ESTE NÚMERO
+
+const watches = [
+  {
+    id: 1,
+    brand: 'Seiko',
+    name: 'Prospex Diver',
+    subtitle: 'Automático · Buceador',
+    type: 'Automático',
+    price: 8500,
+    oldPrice: null,
+    isNew: true,
+    isSale: false,
+    isLimited: false,
+    rating: 4.8,
+    reviews: 34,
+    description: 'El Seiko Prospex es un ícono del buceo. Movimiento automático 4R36 con 41 horas de reserva de marcha. Caja de acero inoxidable, cristal de zafiro y resistencia al agua hasta 200m.',
+    specs: {
+      'Movimiento': 'Automático 4R36',
+      'Caja': '45mm acero inoxidable',
+      'Cristal': 'Zafiro anti-reflejo',
+      'Resistencia': '200m / 20 ATM',
+      'Correa': 'Acero oyster',
+      'Peso': '168g',
+    },
+    // Remplaza estas URLs con las de tus imágenes reales
+    images: [
+      'SJE099J1.png',
+      'https://placehold.co/400x500/141414/c9a96e?text=Seiko+Vista+2',
+      'https://placehold.co/400x500/141414/c9a96e?text=Seiko+Vista+3'
+    ],
+    reviewList: [
+      { name: 'Carlos M.', rating: 5, text: 'Reloj increíble, el acabado es impecable. Vale cada lempira.', date: 'Feb 2026' }
+    ]
+  },
+  {
+    id: 2,
+    brand: 'Citizen',
+    name: 'Eco-Drive Promaster',
+    subtitle: 'Solar · Titanio',
+    type: 'Solar',
+    price: 11200,
+    oldPrice: 13500,
+    isNew: false,
+    isSale: true,
+    isLimited: false,
+    rating: 4.7,
+    reviews: 28,
+    description: 'Tecnología Eco-Drive de Citizen: nunca necesita batería, se recarga con cualquier luz. Caja ultra-ligera de titanio.',
+    specs: {
+      'Movimiento': 'Eco-Drive E168',
+      'Caja': '44mm titanio',
+      'Cristal': 'Zafiro',
+      'Resistencia': '100m / 10 ATM',
+    },
+    images: [
+      'BN0150-28E.webp',
+      'BN0150-28E_Profile.webp',
+      'BN0150-28E_Back.webp',
+      'https://placehold.co/400x500/141414/c9a96e?text=Citizen+Vista+2'
+    ],
+    reviewList: [
+      { name: 'Jorge P.', rating: 5, text: 'No puedo creer que nunca necesite batería.', date: 'Mar 2026' }
+    ]
+  },
+  {
+    id: 3,
+    brand: 'Tissot',
+    name: 'PR 100',
+    subtitle: 'Cronógrafo · Cuarzo',
+    type: 'Cronógrafo',
+    price: 14800,
+    oldPrice: null,
+    isNew: true,
+    isSale: false,
+    isLimited: false,
+    rating: 4.9,
+    reviews: 51,
+    description: 'El Tissot PR 100 es elegancia suiza en su máxima expresión. Cronógrafo de precisión cuarzo, esfera negra.',
+    specs: {
+      'Movimiento': 'Cuarzo ETA G10.212',
+      'Caja': '42mm acero',
+      'Cristal': 'Zafiro anti-reflejo',
+    },
+    images: [
+      'tis-digital-PR100-category-banner.png',
+      'https://placehold.co/400x500/141414/c9a96e?text=Tissot+Vista+2',
+      'https://placehold.co/400x500/141414/c9a96e?text=Tissot+Vista+3'
+    ],
+    reviewList: [
+      { name: 'Andrés V.', rating: 5, text: 'El mejor reloj que he tenido.', date: 'Mar 2026' }
+    ]
+  },
+  {
+    id: 4,
+    brand: 'Casio',
+    name: 'G-Shock GWB5600',
+    subtitle: 'Digital · Resistente',
+    type: 'Digital',
+    price: 4200,
+    oldPrice: null,
+    isNew: false,
+    isSale: false,
+    isLimited: false,
+    rating: 4.6,
+    reviews: 89,
+    description: 'El G-Shock más icónico. Resistencia a golpes, barro y agua. Sincronización solar y radio.',
+    specs: {
+      'Movimiento': 'Módulo 3230',
+      'Caja': 'Resina y acero',
+      'Cristal': 'Mineral',
+    },
+    images: [
+      'GA-2100-1A1_Seq01.AVIF',
+      'GA-2100-1A1_Seq07.AVIF',
+      'GA-2100-1A1_Seq08.AVIF',
+      'https://placehold.co/400x500/141414/22c55e?text=G-Shock+Vista+2'
+    ],
+    reviewList: [
+      { name: 'José M.', rating: 5, text: 'Lo metí al río, lo golpeé en la montaña, sigue perfecto.', date: 'Feb 2026' }
+    ]
+  },
+  {
+    id: 5,
+    brand: 'Bulova',
+    name: 'Precisionist',
+    subtitle: 'Cuarzo · Ultra-preciso',
+    type: 'Cuarzo',
+    price: 9800,
+    oldPrice: null,
+    isNew: true,
+    isSale: false,
+    isLimited: true,
+    rating: 4.7,
+    reviews: 19,
+    description: 'El movimiento Precisionist de Bulova es el cuarzo más preciso del mundo: ±10 segundos por año.',
+    specs: {
+      'Movimiento': 'Bulova 262kHz',
+      'Caja': '43mm acero',
+      'Precisión': '±10 seg/año',
+    },
+    images: [
+      'https://placehold.co/400x500/141414/c9a96e?text=Bulova+Vista+1'
+    ],
+    reviewList: []
+  },
+  {
+    id: 6,
+    brand: 'Orient',
+    name: 'Mako III',
+    subtitle: 'Automático · Dive',
+    type: 'Automático',
+    price: 6200,
+    oldPrice: 7800,
+    isNew: false,
+    isSale: true,
+    isLimited: false,
+    rating: 4.5,
+    reviews: 42,
+    description: 'El mejor automático por precio del mercado. Orient F6922 con ajuste de bisel interna y corona.',
+    specs: {
+      'Movimiento': 'Orient F6922',
+      'Caja': '44mm acero',
+    },
+    images: [
+      'https://placehold.co/400x500/141414/3b82f6?text=Orient+Vista+1',
+      'https://placehold.co/400x500/141414/3b82f6?text=Orient+Vista+2'
+    ],
+    reviewList: []
+  },
+  {
+    id: 7,
+    brand: 'Seiko',
+    name: 'Presage SPB167',
+    subtitle: 'Automático · Esfera de esmalte',
+    type: 'Automático',
+    price: 18500,
+    oldPrice: null,
+    isNew: false,
+    isSale: false,
+    isLimited: true,
+    rating: 4.9,
+    reviews: 15,
+    description: 'El Presage es el Seiko más refinado. Esfera de esmalte artesanal, movimiento 6R35 con 70 horas de reserva.',
+    specs: {
+      'Movimiento': 'Seiko 6R35',
+      'Reserva': '70 horas',
+    },
+    images: [
+      'https://placehold.co/400x500/141414/c9a96e?text=Presage+Vista+1'
+    ],
+    reviewList: []
+  },
+  {
+    id: 8,
+    brand: 'Fossil',
+    name: 'Neutra Chronograph',
+    subtitle: 'Cronógrafo · Acero',
+    type: 'Cronógrafo',
+    price: 5600,
+    oldPrice: 7200,
+    isNew: false,
+    isSale: true,
+    isLimited: false,
+    rating: 4.3,
+    reviews: 67,
+    description: 'Diseño americano moderno con funcionalidad completa. Fossil Neutra combina un aspecto urbano.',
+    specs: {
+      'Movimiento': 'Cuarzo FS5412',
+      'Funciones': 'Fecha, Cronógrafo',
+    },
+    images: [
+      'https://placehold.co/400x500/141414/c9a96e?text=Fossil+Vista+1',
+      'https://placehold.co/400x500/141414/c9a96e?text=Fossil+Vista+2'
+    ],
+    reviewList: []
+  },
+  {
+    id: 9,
+    brand: 'Invicta',
+    name: 'Pro Diver 8926OB',
+    subtitle: 'Automático · Clásico',
+    type: 'Automático',
+    price: 3800,
+    oldPrice: null,
+    isNew: false,
+    isSale: false,
+    isLimited: false,
+    rating: 4.4,
+    reviews: 123,
+    description: 'El automático más vendido de América. Inspirado en un legendario reloj suizo.',
+    specs: {
+      'Movimiento': 'NH35A automático',
+      'Resistencia': '200m / 20 ATM',
+    },
+    images: [
+      'https://placehold.co/400x500/141414/c9a96e?text=Invicta+Vista+1'
+    ],
+    reviewList: []
+  },
+  {
+    id: 10,
+    brand: 'Tissot',
+    name: 'T-Race MotoGP',
+    subtitle: 'Cuarzo · Edición MotoGP',
+    type: 'Cuarzo',
+    price: 16200,
+    oldPrice: null,
+    isNew: true,
+    isSale: false,
+    isLimited: true,
+    rating: 4.8,
+    reviews: 22,
+    description: 'Cronometrador oficial de MotoGP. Diseño racing inspirado en las pistas.',
+    specs: {
+      'Movimiento': 'Cuarzo ETA G10.212',
+      'Edición': 'MotoGP 2026',
+    },
+    images: [
+      'https://placehold.co/400x500/141414/ef4444?text=MotoGP+Vista+1'
+    ],
+    reviewList: []
+  },
+  {
+    id: 11,
+    brand: 'Citizen',
+    name: 'Blue Angels',
+    subtitle: 'Solar · Edición especial',
+    type: 'Solar',
+    price: 22000,
+    oldPrice: null,
+    isNew: false,
+    isSale: false,
+    isLimited: true,
+    rating: 5.0,
+    reviews: 8,
+    description: 'El reloj oficial de los Blue Angels de la US Navy. Eco-Drive con calibre CB5004.',
+    specs: {
+      'Movimiento': 'Eco-Drive CB5004',
+      'Funciones': 'UTC, Radio, Bisel vuelo',
+    },
+    images: [
+      'https://placehold.co/400x500/141414/3b82f6?text=Blue+Angels+Vista+1'
+    ],
+    reviewList: []
+  },
+  {
+    id: 12,
+    brand: 'Casio',
+    name: 'G-Shock GA-2100',
+    subtitle: 'Cuarzo · CasiOak',
+    type: 'Cuarzo',
+    price: 3400,
+    oldPrice: 4200,
+    isNew: false,
+    isSale: true,
+    isLimited: false,
+    rating: 4.6,
+    reviews: 156,
+    description: 'El G-Shock más delgado y elegante de la historia. Apodado "CasiOak".',
+    specs: {
+      'Movimiento': 'Módulo 5611',
+      'Grosor': '11.8mm',
+    },
+    images: [
+      'https://placehold.co/400x500/141414/c9a96e?text=CasiOak+Vista+1',
+      'https://placehold.co/400x500/141414/c9a96e?text=CasiOak+Vista+2'
+    ],
+    reviewList: []
+  },
+];
+
+// ============================================
+// STATE
+// ============================================
+let activeFilters = {
+  brands: [],
+  types: [],
+  priceMin: null,
+  priceMax: null,
+  newOnly: false,
+  sort: 'featured',
+};
+let currentProduct = null;
+
+// ============================================
+// LOADER
+// ============================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const loader = document.getElementById('bsic-loader');
+
+    loader.classList.add('hidden');
+
+    setTimeout(() => {
+      loader.style.display = 'none';
+
+      // 🔥 AQUÍ abrimos el modal
+      openBrandModal();
+
+    }, 800);
+
+    initCatalog();
+    initScrollReveal();
+
+  }, 2200);
+});
+
+// ============================================
+// NAV SCROLL
+// ============================================
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ============================================
+// MOBILE MENU
+// ============================================
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+
+  menu.classList.remove('open');
+  btn.classList.remove('open');
+}
+
+// ============================================
+// SCROLL REVEAL
+// ============================================
+function initScrollReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+document.addEventListener('click', (e) => {
+  const dropdown = e.target.closest('.filter-group');
+
+  if (!dropdown) {
+    closeAllFilters();
+  }
+});
+
+// 🔥 extra para móvil
+document.addEventListener('touchstart', (e) => {
+  const dropdown = e.target.closest('.filter-group');
+
+  if (!dropdown) {
+    closeAllFilters();
+  }
+});
+
+function closeAllFilters() {
+  document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('open'));
+}
+document.querySelectorAll('.filter-dropdown').forEach(dd => {
+  dd.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  dd.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+  });
+});
+// ============================================
+// FILTERS
+// ============================================
+function toggleDropdown(id, btn) {
+  const dd = document.getElementById(id);
+  const isOpen = dd.classList.contains('open');
+
+  document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('open'));
+
+  if (!isOpen) {
+    dd.classList.add('open');
+    btn.classList.add('open');
+  }
+}
+
+document.addEventListener('click', (e) => {
+  const isInside = e.target.closest('.filter-group');
+
+  if (!isInside) {
+    document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('open'));
+  }
+});
+
+function toggleNewOnly() {
+  activeFilters.newOnly = !activeFilters.newOnly;
+  document.getElementById('newOnlyBtn').classList.toggle('active', activeFilters.newOnly);
+  applyFilters();
+}
+
+function togglePricePreset(cb, min, max) {
+  if (cb.checked) {
+    document.getElementById('priceMin').value = min;
+    document.getElementById('priceMax').value = max === 999999 ? '' : max;
+    activeFilters.priceMin = min;
+    activeFilters.priceMax = max;
+  } else {
+    document.getElementById('priceMin').value = '';
+    document.getElementById('priceMax').value = '';
+    activeFilters.priceMin = null;
+    activeFilters.priceMax = null;
+  }
+  applyFilters();
+}
+
+function applyFilters() {
+  const brandCbs = document.querySelectorAll('#brandDropdown input:checked');
+  const typeCbs = document.querySelectorAll('#typeDropdown input:checked');
+  activeFilters.brands = Array.from(brandCbs).map(c => c.value);
+  activeFilters.types = Array.from(typeCbs).map(c => c.value);
+  const pMin = document.getElementById('priceMin').value;
+  const pMax = document.getElementById('priceMax').value;
+  activeFilters.priceMin = pMin ? parseFloat(pMin) : null;
+  activeFilters.priceMax = pMax ? parseFloat(pMax) : null;
+  activeFilters.sort = document.getElementById('sortSelect').value;
+  renderCatalog();
+  renderActiveFilterChips();
+}
+
+function renderActiveFilterChips() {
+  const container = document.getElementById('activeFilters');
+  container.innerHTML = '';
+  activeFilters.brands.forEach(b => addChip(container, b, () => removeFilter('brand', b)));
+  activeFilters.types.forEach(t => addChip(container, t, () => removeFilter('type', t)));
+  if (activeFilters.priceMin !== null || activeFilters.priceMax !== null) {
+    const min = activeFilters.priceMin ?? 0;
+    const max = activeFilters.priceMax;
+    const label = max ? `L. ${min.toLocaleString()} – L. ${max.toLocaleString()}` : `+ L. ${min.toLocaleString()}`;
+    addChip(container, label, () => removeFilter('price'));
+  }
+  if (activeFilters.newOnly) addChip(container, 'Novedades', () => { activeFilters.newOnly = false; document.getElementById('newOnlyBtn').classList.remove('active'); renderCatalog(); renderActiveFilterChips(); });
+}
+
+function addChip(container, label, removeFn) {
+  const chip = document.createElement('div');
+  chip.className = 'filter-chip';
+
+  const span = document.createElement('span');
+  span.textContent = label;
+
+  const btn = document.createElement('button');
+  btn.textContent = '✕';
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation(); // 🔥 evita bugs
+    removeFn();
+  });
+
+  chip.appendChild(span);
+  chip.appendChild(btn);
+  container.appendChild(chip);
+}
+
+function removeFilter(type, value) {
+  if (type === 'brand') {
+    activeFilters.brands = activeFilters.brands.filter(b => b !== value);
+    document.querySelectorAll('#brandDropdown input').forEach(cb => { if (cb.value === value) cb.checked = false; });
+  } else if (type === 'type') {
+    activeFilters.types = activeFilters.types.filter(t => t !== value);
+    document.querySelectorAll('#typeDropdown input').forEach(cb => { if (cb.value === value) cb.checked = false; });
+  } else if (type === 'price') {
+    activeFilters.priceMin = null; activeFilters.priceMax = null;
+    document.getElementById('priceMin').value = '';
+    document.getElementById('priceMax').value = '';
+    document.querySelectorAll('#priceDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
+  }
+  renderCatalog();
+  renderActiveFilterChips();
+}
+
+// ============================================
+// CATALOG RENDER
+// ============================================
+function initCatalog() {
+  renderCatalog();
+}
+
+function filterAndSort() {
+  let filtered = [...watches];
+  if (activeFilters.brands.length > 0)
+    filtered = filtered.filter(w => activeFilters.brands.includes(w.brand));
+  if (activeFilters.types.length > 0)
+    filtered = filtered.filter(w => activeFilters.types.includes(w.type));
+  if (activeFilters.priceMin !== null)
+    filtered = filtered.filter(w => w.price >= activeFilters.priceMin);
+  if (activeFilters.priceMax !== null)
+    filtered = filtered.filter(w => w.price <= activeFilters.priceMax);
+  if (activeFilters.newOnly)
+    filtered = filtered.filter(w => w.isNew);
+  switch (activeFilters.sort) {
+    case 'newest': filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)); break;
+    case 'price-asc': filtered.sort((a, b) => a.price - b.price); break;
+    case 'price-desc': filtered.sort((a, b) => b.price - a.price); break;
+    case 'rating': filtered.sort((a, b) => b.rating - a.rating); break;
+  }
+  return filtered;
+}
+
+function renderCatalog() {
+  const grid = document.getElementById('catalogGrid');
+  const filtered = filterAndSort();
+  document.getElementById('resultsCount').textContent = filtered.length;
+  const existingNoResults = document.getElementById('noResults');
+  grid.innerHTML = '';
+  grid.appendChild(existingNoResults);
+  existingNoResults.classList.toggle('show', filtered.length === 0);
+  filtered.forEach((watch, i) => {
+    const card = createCard(watch, i);
+    grid.appendChild(card);
+    setTimeout(() => card.classList.add('visible'), i * 60);
+  });
+}
+
+function createCard(w, i) {
+  const card = document.createElement('div');
+  card.className = 'product-card';
+  card.style.animationDelay = `${i * 0.06}s`;
+  const badge = w.isNew ? '<div class="card-badge badge-new">Nuevo</div>' :
+                w.isSale ? '<div class="card-badge badge-sale">Oferta</div>' :
+                w.isLimited ? '<div class="card-badge badge-limited">Limitado</div>' : '';
+  const oldPriceHtml = w.oldPrice ? `<span class="card-price-old">L. ${w.oldPrice.toLocaleString()}</span>` : '';
+  const starsHtml = renderStars(w.rating, 'star');
+  card.innerHTML = `
+    ${badge}
+    <div class="card-img-wrap">
+      <img src="${w.images[0]}" alt="${w.name}" class="watch-img">
+      <div class="card-overlay">
+        <button class="card-overlay-btn" onclick="openProduct(${w.id})">Ver Detalles</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="card-brand">${w.brand}</p>
+      <h3 class="card-name">${w.name}</h3>
+      <div class="card-footer">
+        <div>
+          <span class="card-price">L. ${w.price.toLocaleString()}</span>${oldPriceHtml}
+        </div>
+        <div style="display:flex;align-items:center;">
+          <div class="card-stars">${starsHtml}</div>
+          <span class="card-rating-count">(${w.reviews})</span>
+        </div>
+      </div>
+    </div>
+  `;
+  card.addEventListener('click', e => {
+    if (!e.target.closest('.card-overlay-btn')) openProduct(w.id);
+  });
+  return card;
+}
+
+function renderStars(rating, className) {
+  let html = '';
+  for (let i = 1; i <= 5; i++) {
+    html += `<span class="${className}${i <= Math.round(rating) ? '' : ' empty'}">★</span>`;
+  }
+  return html;
+}
+
+// ============================================
+// PRODUCT MODAL (GALERÍA DE IMÁGENES)
+// ============================================
+function openProduct(id) {
+  const watch = watches.find(w => w.id === id);
+  if (!watch) return;
+  currentProduct = watch;
+  
+  const imgSide = document.getElementById('modalImgSide');
+  const watchDisplay = document.getElementById('modalWatchDisplay');
+  const modalThumbs = document.getElementById('modalThumbs');
+  const infoSide = document.getElementById('modalInfoSide');
+
+  // Cargar imagen principal
+  watchDisplay.innerHTML = `<img id="mainModalImg" src="${watch.images[0]}" alt="${watch.name}">`;
+
+  // Cargar miniaturas
+  let thumbsHtml = '';
+  watch.images.forEach((img, idx) => {
+    const activeClass = idx === 0 ? 'active' : '';
+    // Escapando las comillas para llamar a la función changeModalImg
+    thumbsHtml += `<div class="thumb ${activeClass}" onclick="changeModalImg('${img}', this)">
+                     <img src="${img}" alt="Vista ${idx+1}">
+                   </div>`;
+  });
+  modalThumbs.innerHTML = thumbsHtml;
+
+  // Reactivar la animación
+  watchDisplay.style.animation = 'none';
+  void watchDisplay.offsetWidth;
+  watchDisplay.style.animation = 'modalWatchIn 0.8s 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both';
+
+  const oldPriceHtml = watch.oldPrice ? `<span class="modal-price-old">L. ${watch.oldPrice.toLocaleString()}</span>` : '';
+  const savingsHtml = watch.oldPrice ? `<span class="modal-savings">Ahorras L. ${(watch.oldPrice - watch.price).toLocaleString()}</span>` : '';
+  const starsHtml = renderStars(watch.rating, 'modal-star');
+  let specsHtml = '';
+  Object.entries(watch.specs).forEach(([k, v]) => {
+    specsHtml += `<div class="spec-item"><p class="spec-label">${k}</p><p class="spec-value">${v}</p></div>`;
+  });
+  let reviewsHtml = '';
+  watch.reviewList.forEach(r => {
+    reviewsHtml += `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">${r.name.charAt(0)}</div>
+            <div>
+              <p class="reviewer-name">${r.name}</p>
+              <p class="reviewer-date">${r.date}</p>
+            </div>
+          </div>
+          <div class="review-stars">${renderStars(r.rating, 'star')}</div>
+        </div>
+        <p class="review-text">${r.text}</p>
+        <p class="review-verified">✓ Compra verificada</p>
+      </div>`;
+  });
+  const badge = watch.isNew ? '<span style="padding:3px 10px;background:var(--gold);color:var(--black);font-size:10px;font-family:var(--font-ui);letter-spacing:.2em;font-weight:600;">NUEVO</span>' :
+               watch.isSale ? '<span style="padding:3px 10px;background:var(--red);color:#fff;font-size:10px;font-family:var(--font-ui);letter-spacing:.2em;font-weight:600;">OFERTA</span>' :
+               watch.isLimited ? '<span style="padding:3px 10px;border:1px solid var(--gold);color:var(--gold);font-size:10px;font-family:var(--font-ui);letter-spacing:.2em;">LIMITADO</span>' : '';
+  infoSide.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:16px;">${badge}</div>
+    <p class="modal-eyebrow">${watch.brand}</p>
+    <h2 class="modal-title">${watch.name}</h2>
+    <p class="modal-subtitle">${watch.subtitle}</p>
+    <div class="modal-rating">
+      <div class="modal-stars">${starsHtml}</div>
+      <span class="modal-rating-text">${watch.rating} · ${watch.reviews} reseñas</span>
+    </div>
+    <div class="modal-price-wrap">
+      <span class="modal-price">L. ${watch.price.toLocaleString()}</span>
+      ${oldPriceHtml}${savingsHtml}
+    </div>
+    <p class="modal-desc">${watch.description}</p>
+    <div class="modal-specs">
+      <p class="modal-specs-title">Especificaciones</p>
+      <div class="spec-grid">${specsHtml}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-whatsapp" onclick="openWhatsApp('product')">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Continuar con la Compra
+      </button>
+      <button class="btn-wishlist">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Agregar a favoritos
+      </button>
+    </div>
+    <div class="modal-reviews">
+      <div class="reviews-header">
+        <p class="reviews-title">Reseñas de clientes</p>
+        <div class="reviews-avg">
+          <span class="reviews-avg-num">${watch.rating}</span>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div class="modal-stars" style="font-size:12px;">${starsHtml}</div>
+            <span style="font-family:var(--font-ui);font-size:11px;color:var(--muted);">${watch.reviews} reseñas</span>
+          </div>
+        </div>
+      </div>
+      ${reviewsHtml}
+    </div>`;
+
+  document.getElementById('productModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function changeModalImg(src, thumbElement) {
+  // Cambiar la imagen grande
+  document.getElementById('mainModalImg').src = src;
+  
+  // Actualizar el estilo de la miniatura seleccionada
+  document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+  thumbElement.classList.add('active');
+}
+function openBrandModal() {
+  document.getElementById('brandModal').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('productModal').classList.remove('open');
+  document.body.style.overflow = '';
+  currentProduct = null;
+}
+
+function handleModalOverlayClick(e) {
+  if (e.target === document.getElementById('productModal')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ============================================
+// WHATSAPP
+// ============================================
+function openWhatsApp(type) {
+  let message;
+  if (type === 'product' && currentProduct) {
+    const w = currentProduct;
+    message = `¡Hola! Me interesa comprar este reloj:\n\n` +
+      `*${w.brand} ${w.name}*\n` +
+      `📋 Tipo: ${w.subtitle}\n` +
+      `💰 Precio: L. ${w.price.toLocaleString()}\n` +
+      `⭐ Valoración: ${w.rating}/5 (${w.reviews} reseñas)\n\n` +
+      `¿Está disponible? ¿Cuál es el tiempo de entrega?`;
+  } else {
+    message = `¡Hola! Visité su tienda bsic. y me gustaría obtener más información sobre sus relojes. 🕐`;
+  }
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+  showToast('Redirigiendo a WhatsApp...');
+}
+// abrir automáticamente al cargar
+// window.addEventListener('load', () => {
+//   document.getElementById('brandModal').style.display = 'flex';
+// });
+
+// cerrar modal
+function closeBrandModal() {
+  document.getElementById('brandModal').style.display = 'none';
+}
+
+// seleccionar marca
+function selectBrand(brand) {
+  activeFilters.brands = [brand];
+
+  // sincronizar checkbox
+  document.querySelectorAll('#brandDropdown input').forEach(cb => {
+    cb.checked = cb.value === brand;
+  });
+
+  applyFilters();
+  closeBrandModal();
+}
+// ============================================
+// TOAST
+// ============================================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+<div class="brand-modal" id="brandModal">
+  <div class="brand-modal-content">
+
+    <h2>Selecciona una marca</h2>
+
+    <div class="brand-grid">
+
+      <div class="brand-item" onclick="selectBrand('Casio')">
+        <img src="Casio-Logo-Download-Free-PNG.png" alt="Casio">
+      </div>
+
+      <div class="brand-item" onclick="selectBrand('Seiko')">
+        <img src="Seiko_logo_black.png" alt="Seiko">
+      </div>
+
+      <div class="brand-item" onclick="selectBrand('Bulova')">
+        <img src="Bulova_Logo.png" alt="Bulova">
+      </div>
+
+      <div class="brand-item" onclick="selectBrand('Citizen')">
+        <img src="7762.T_BIG.D-d9c48d15.png" alt="Citizen">
+      </div>
+
+      <div class="brand-item" onclick="selectBrand('Fossil')">
+        <img src="FOSL_BIG.D-87968f86.png" alt="Fossil">
+      </div>
+
+      <div class="brand-item" onclick="selectBrand('Tudor')">
+        <img src="Tudor_logo.png" alt="Tudor">
+      </div>
+
+      <div class="brand-item" onclick="selectBrand('Rolex')">
+        <img src="pngegg.png" alt="Rolex">
+      </div>
+
+      <div class="brand-item" onclick="selectBrand('G-Shock')">
+        <img src="G-Shock_logo_black.png" alt="G-Shock">
+      </div>
+
+      <div class="brand-item" onclick="selectBrand('Omega')">
+        <img src="omega.png" alt="Omega">
+      </div>
+
+    </div>
+
+    <button class="skip-btn" onclick="closeBrandModal()">Ver todo</button>
+
+  </div>
+</div>
+</body>
+</html>
