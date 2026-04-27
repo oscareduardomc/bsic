@@ -1743,34 +1743,17 @@ footer {
           <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="filter-dropdown" id="typeDropdown">
-          <label class="filter-option"><input type="checkbox" value="Automático" onchange="applyFilters()"> Automático</label>
-          <label class="filter-option"><input type="checkbox" value="Solar" onchange="applyFilters()"> Solar</label>
-          <label class="filter-option"><input type="checkbox" value="Cuarzo" onchange="applyFilters()"> Cuarzo</label>
-          <label class="filter-option"><input type="checkbox" value="Cronógrafo" onchange="applyFilters()"> Cronógrafo</label>
+          <!-- <label class="filter-option"><input type="checkbox" value="Automático" onchange="applyFilters()"> Automático</label> -->
+          <!-- <label class="filter-option"><input type="checkbox" value="Solar" onchange="applyFilters()"> Solar</label> -->
+          <!-- <label class="filter-option"><input type="checkbox" value="Cuarzo" onchange="applyFilters()"> Cuarzo</label> -->
+          <!-- <label class="filter-option"><input type="checkbox" value="Cronógrafo" onchange="applyFilters()"> Cronógrafo</label> -->
           <label class="filter-option"><input type="checkbox" value="Digital" onchange="applyFilters()"> Digital</label>
-          <label class="filter-option"><input type="checkbox" value="Smartwatch" onchange="applyFilters()"> Smartwatch</label>
+          <label class="filter-option"><input type="checkbox" value="Diver" onchange="applyFilters()"> Diver</label>
+          <label class="filter-option"><input type="checkbox" value="Classic" onchange="applyFilters()"> Classic</label>
+          <!-- <label class="filter-option"><input type="checkbox" value="Smartwatch" onchange="applyFilters()"> Smartwatch</label> -->
         </div>
       </div>
-
-      <div class="filter-group" id="priceFilter">
-        <button class="filter-btn" onclick="toggleDropdown('priceDropdown', this)">
-          Precio
-          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="filter-dropdown" id="priceDropdown">
-          <div class="price-range">
-            <div class="price-inputs">
-              <input type="number" id="priceMin" placeholder="Min" min="0" oninput="applyFilters()">
-              <span>—</span>
-              <input type="number" id="priceMax" placeholder="Máx" min="0" oninput="applyFilters()">
-            </div>
-            <label class="filter-option" style="padding:0"><input type="checkbox" value="under100" onchange="togglePricePreset(this, 0, 100)"> Menos de L. 2,500</label>
-            <label class="filter-option" style="padding:0"><input type="checkbox" value="100-300" onchange="togglePricePreset(this, 2500, 7500)"> L. 2,500 – L. 7,500</label>
-            <label class="filter-option" style="padding:0"><input type="checkbox" value="300-700" onchange="togglePricePreset(this, 7500, 17500)"> L. 7,500 – L. 17,500</label>
-            <label class="filter-option" style="padding:0"><input type="checkbox" value="over700" onchange="togglePricePreset(this, 17500, 999999)"> Más de L. 17,500</label>
-          </div>
-        </div>
-      </div>
+ 
 
       <button class="filter-btn" id="newOnlyBtn" onclick="toggleNewOnly()">
         Novedades
@@ -2321,30 +2304,14 @@ function toggleNewOnly() {
   applyFilters();
 }
 
-function togglePricePreset(cb, min, max) {
-  if (cb.checked) {
-    document.getElementById('priceMin').value = min;
-    document.getElementById('priceMax').value = max === 999999 ? '' : max;
-    activeFilters.priceMin = min;
-    activeFilters.priceMax = max;
-  } else {
-    document.getElementById('priceMin').value = '';
-    document.getElementById('priceMax').value = '';
-    activeFilters.priceMin = null;
-    activeFilters.priceMax = null;
-  }
-  applyFilters();
-}
+ 
 
 function applyFilters() {
   const brandCbs = document.querySelectorAll('#brandDropdown input:checked');
   const typeCbs = document.querySelectorAll('#typeDropdown input:checked');
   activeFilters.brands = Array.from(brandCbs).map(c => c.value);
   activeFilters.types = Array.from(typeCbs).map(c => c.value);
-  const pMin = document.getElementById('priceMin').value;
-  const pMax = document.getElementById('priceMax').value;
-  activeFilters.priceMin = pMin ? parseFloat(pMin) : null;
-  activeFilters.priceMax = pMax ? parseFloat(pMax) : null;
+  
   activeFilters.sort = document.getElementById('sortSelect').value;
   renderCatalog();
   renderActiveFilterChips();
