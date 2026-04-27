@@ -1418,16 +1418,26 @@ footer {
   nav { padding: 16px 20px; }
   nav.scrolled { padding: 12px 20px; }
   .filter-dropdown {
-    position: fixed;  
-    left: 16px;
-    right: 16px;
-    top: auto;
-    bottom: 80px;      
-    width: auto;
-    min-width: unset;
-    z-index: 9999;
-    border-radius: 12px;
-  }
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  top: 50%;                  /* 🔥 centrado */
+  transform: translateY(-50%);
+  width: auto;
+  min-width: unset;
+  z-index: 9999;
+  border-radius: 12px;
+
+  max-height: 70vh;          /* 🔥 evita que crezca demasiado */
+  overflow-y: auto;          /* scroll interno */
+}
+.filter-dropdown::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: -1;
+}
   .nav-links { display: none; }
   .hamburger { display: flex; }
 
@@ -1459,6 +1469,7 @@ footer {
   .card-stars{display: none;}
   .card-rating-count{display: none;}
   .footer-inner { grid-template-columns: 1fr; }
+  
 }
 </style>
 </head>
