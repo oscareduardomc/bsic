@@ -299,9 +299,12 @@ nav.scrolled {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 70% 50%, rgba(201,169,110,0.06) 0%, transparent 60%),
-              radial-gradient(ellipse at 20% 80%, rgba(201,169,110,0.04) 0%, transparent 50%),
-              linear-gradient(180deg, var(--black) 0%, #0c0a08 100%);
+  background:
+    linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), /* oscurece la imagen */
+    url("pexels-umudicreative-36484112.jpg") center/cover no-repeat,
+    radial-gradient(ellipse at 70% 50%, rgba(201,169,110,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgba(201,169,110,0.04) 0%, transparent 50%),
+    linear-gradient(180deg, var(--black) 0%, #0c0a08 100%);
 }
 .hero-grid {
   position: absolute;
@@ -500,7 +503,6 @@ nav.scrolled {
 @keyframes fadeUp {
   to { opacity: 1; transform: translateY(0); }
 }
-
 /* ============================================
    BRANDS MARQUEE
    ============================================ */
@@ -511,16 +513,27 @@ nav.scrolled {
   overflow: hidden;
   position: relative;
 }
+
 .brands-section::before,
 .brands-section::after {
   content: '';
   position: absolute;
-  top: 0; bottom: 0;
+  top: 0;
+  bottom: 0;
   width: 100px;
   z-index: 2;
 }
-.brands-section::before { left: 0; background: linear-gradient(to right, var(--black), transparent); }
-.brands-section::after { right: 0; background: linear-gradient(to left, var(--black), transparent); }
+
+.brands-section::before {
+  left: 0;
+  background: linear-gradient(to right, var(--black), transparent);
+}
+
+.brands-section::after {
+  right: 0;
+  background: linear-gradient(to left, var(--black), transparent);
+}
+
 .brands-track {
   display: flex;
   gap: 72px;
@@ -528,22 +541,30 @@ nav.scrolled {
   animation: marquee 25s linear infinite;
   width: max-content;
 }
-.brands-track:hover { animation-play-state: paused; }
+
+.brands-track:hover {
+  animation-play-state: paused;
+}
+
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+
+/* 🔥 AQUÍ ESTÁ EL ARREGLO */
 .brand-logo {
-  font-family: var(--font-ui);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: var(--muted);
-  text-transform: uppercase;
-  transition: color var(--transition);
-  white-space: nowrap;
+  height: 40px;        /* tamaño más pequeño */
+  width: auto;
+  max-width: 120px;    /* evita logos muy grandes */
+  object-fit: contain;
+  opacity: 0.7;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
-.brand-logo:hover { color: var(--gold); }
+
+.brand-logo:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
 
 /* ============================================
    SECTION COMMONS
@@ -588,7 +609,10 @@ nav.scrolled {
   margin-bottom: 40px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--border);
+   position: relative;
+  z-index: 200;
 }
+
 .filters-left {
   display: flex;
   flex-wrap: wrap;
@@ -596,6 +620,8 @@ nav.scrolled {
 }
 .filter-group {
   position: relative;
+    z-index: 300;
+
 }
 .filter-btn {
   display: flex;
@@ -621,7 +647,7 @@ nav.scrolled {
   background: #161616;
   border: 1px solid var(--border2);
   min-width: 200px;
-  z-index: 100;
+  z-index: 9999;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-8px);
@@ -1285,7 +1311,7 @@ nav.scrolled {
    FEATURES SECTION
    ============================================ */
 .features-section {
-  padding: 80px 32px;
+  padding: 0px 32px;
   background: var(--dark);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -1480,13 +1506,29 @@ footer {
 @media (max-width: 768px) {
   nav { padding: 16px 20px; }
   nav.scrolled { padding: 12px 20px; }
+  .filter-dropdown {
+    position: fixed;  
+    left: 16px;
+    right: 16px;
+    top: auto;
+    bottom: 80px;      
+    width: auto;
+    min-width: unset;
+    z-index: 9999;
+    border-radius: 12px;
+  }
   .nav-links { display: none; }
   .hamburger { display: flex; }
   .hero-content { padding: 100px 24px 60px; max-width: 100%; }
   .hero-watch-wrap { display: none; }
   #catalog { padding: 60px 16px; }
-  .filters-bar { flex-direction: column; align-items: stretch; }
-  .filters-left { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .filters-bar { flex-direction: column; align-items: stretch;  z-index: 500; gap: 16px;}
+  .filters-left { display: flex;
+    overflow-x: auto;}
+  .filter-btn {
+    white-space: nowrap;
+    min-width: max-content; /* 🔥 clave */
+  }
   .filters-right { justify-content: flex-end; }
   .catalog-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .modal { margin: 0; min-height: 100vh; border: none; }
@@ -1497,10 +1539,16 @@ footer {
   .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
   .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
   .spec-grid { grid-template-columns: 1fr; }
+  .card-stars{display: none;}
+  .card-rating-count{display: none;}
+
+
   .hero-actions { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 480px) {
-  .catalog-grid { grid-template-columns: 1fr; }
+  /* .catalog-grid { grid-template-columns: 1fr; } */
+  .card-stars{display: none;}
+  .card-rating-count{display: none;}
   .footer-inner { grid-template-columns: 1fr; }
 }
 </style>
@@ -1688,7 +1736,6 @@ footer {
   </div>
 
 <div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-menu-close" id="mobileMenuClose">✕</button>
   <a href="#" onclick="closeMobileMenu()">Inicio</a>
   <a href="#catalog" onclick="closeMobileMenu()">Catálogo</a>
   <a href="#brands" onclick="closeMobileMenu()">Marcas</a>
@@ -1706,12 +1753,12 @@ footer {
     <li><a href="#" onclick="openWhatsApp('general'); return false;">Contacto</a></li>
   </ul>
   <div class="nav-actions">
-    <a href="#" class="nav-cart" title="Carrito">
+    <!-- <a href="#" class="nav-cart" title="Carrito">
       <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-    </a>
-    <button class="hamburger" id="hamburgerBtn" onclick="openMobileMenu()">
-      <span></span><span></span><span></span>
-    </button>
+    </a> -->
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+  <span></span><span></span><span></span>
+</button>
   </div>
 </nav>
 
@@ -1723,47 +1770,106 @@ footer {
     <h1 class="hero-title">Estilo <em>Simple,</em><br>Esencia Fuerte.</h1>
     <p class="hero-subtitle">Relojes y perfumes para hombres que saben lo que quieren. Marcas de élite con garantía oficial.</p>
     <div class="hero-actions">
-      <a href="#catalog" class="btn-primary"><span>Ver Colección</span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#catalog" class="btn-primary"><span>Ver Catálogo</span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
       <a href="#" class="btn-secondary" onclick="openWhatsApp('general'); return false;">WhatsApp</a>
     </div>
   </div>
-  <div class="hero-watch-wrap">
+  <!-- <div class="hero-watch-wrap">
     <div class="hero-watch-img">
       <div class="hero-ring"></div>
       <div class="hero-ring"></div>
       <div class="hero-ring"></div>
       <img src="Gemini_Generated_Image_vfeq1qvfeq1qvfeq.png" alt="Reloj Destacado" style="width: 650px; height: 650px; object-fit: contain; border-radius: 50%; z-index: 10;">
     </div>
-  </div>
+  </div> -->
+  
   <div class="hero-scroll">
     <span>Descubrir</span>
     <div class="scroll-line"></div>
   </div>
 </section>
 
-<section class="brands-section" id="brands">
-  <div class="brands-track" id="brandsTrack">
-    <span class="brand-logo">Bulova</span>
-    <span class="brand-logo">Seiko</span>
-    <span class="brand-logo">Citizen</span>
-    <span class="brand-logo">Tissot</span>
-    <span class="brand-logo">Casio</span>
-    <span class="brand-logo">Orient</span>
-    <span class="brand-logo">Invicta</span>
-    <span class="brand-logo">Fossil</span>
-    <span class="brand-logo">G-Shock</span>
-    <span class="brand-logo">Bulova</span>
-    <span class="brand-logo">Seiko</span>
-    <span class="brand-logo">Citizen</span>
-    <span class="brand-logo">Tissot</span>
-    <span class="brand-logo">Casio</span>
-    <span class="brand-logo">Orient</span>
-    <span class="brand-logo">Invicta</span>
-    <span class="brand-logo">Fossil</span>
-    <span class="brand-logo">G-Shock</span>
+<section class="features-section">
+  <div class="features-inner">
+    <div class="feature-item reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="feature-text">
+        <h4>Compra Segura</h4>
+        <p>Tus datos están protegidos con encriptación de alto nivel.</p>
+      </div>
+    </div>
+    <div class="feature-item reveal reveal-delay-1">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="feature-text">
+        <h4>Productos Originales</h4>
+        <p>100% auténticos con garantía oficial de fábrica.</p>
+      </div>
+    </div>
+    <div class="feature-item reveal reveal-delay-2">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <div class="feature-text">
+        <h4>Envíos a Honduras</h4>
+        <p>Entrega rápida y segura a todo el país.</p>
+      </div>
+    </div>
   </div>
 </section>
+<section class="brands-section" id="brands">
+  <div class="brands-track" id="brandsTrack">
+   
+    <img class="brand-logo" src="Casio-Logo-Download-Free-PNG.png" alt="Seiko">
+    <img class="brand-logo" src="Bulova_Logo.png" alt="Bulova">
+    <img class="brand-logo" src="Seiko_logo_black.png" alt="Seiko">
+    <img class="brand-logo" src="G-Shock_logo_black.png" alt="G-Shock">
+    <img class="brand-logo" src="Tudor_logo.png" alt="Tudor">
+    <img class="brand-logo" src="pngegg.png" alt="Rolex">
+    <img class="brand-logo" src="Casio-Logo-Download-Free-PNG.png" alt="Casio">
+    <img class="brand-logo" src="FOSL_BIG.D-87968f86.png" alt="Fossil">
+    <img class="brand-logo" src="7762.T_BIG.D-d9c48d15.png" alt="Citizen">
+    <img class="brand-logo" src="omega.png" alt="Omega">
+    <img class="brand-logo" src="Bulova_Logo.png" alt="Bulova">
+    <img class="brand-logo" src="Seiko_logo_black.png" alt="Seiko">
+    <img class="brand-logo" src="Tudor_logo.png" alt="Tudor">
+    <img class="brand-logo" src="pngegg.png" alt="Rolex">
+    <img class="brand-logo" src="FOSL_BIG.D-87968f86.png" alt="Fossil">
+    <img class="brand-logo" src="7762.T_BIG.D-d9c48d15.png" alt="Citizen">
 
+  </div>
+</section>
+<section id="trending" style="padding: 60px 32px; background: var(--black);">
+  <div class="section-header">
+    <p class="section-eyebrow">Selección Especial</p>
+    <h2 class="section-title">Lo más <em>Trending</em></h2>
+  </div>
+  <div id="trendingGrid" class="catalog-grid">
+    </div>
+</section>
+
+<script>
+// Agrega esta función al final de tu script para cargar los 5 destacados
+function initTrending() {
+  const trendingGrid = document.getElementById('trendingGrid');
+  // Tomamos los primeros 5 relojes del array 'watches'
+  const topWatches = watches.slice(0, 4); 
+  
+  topWatches.forEach((watch, i) => {
+    const card = createCard(watch, i);
+    trendingGrid.appendChild(card);
+    // Hacerlos visibles
+    setTimeout(() => card.classList.add('visible'), i * 100);
+  });
+}
+// Llama a la función al cargar la página
+window.addEventListener('DOMContentLoaded', () => {
+   initTrending();
+});
+</script>
 <section id="catalog">
   <div class="section-header reveal">
     <p class="section-eyebrow">Nuestra Colección</p>
@@ -1852,37 +1958,6 @@ footer {
   </div>
 </section>
 
-<section class="features-section">
-  <div class="features-inner">
-    <div class="feature-item reveal">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      </div>
-      <div class="feature-text">
-        <h4>Compra Segura</h4>
-        <p>Tus datos están protegidos con encriptación de alto nivel.</p>
-      </div>
-    </div>
-    <div class="feature-item reveal reveal-delay-1">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      </div>
-      <div class="feature-text">
-        <h4>Productos Originales</h4>
-        <p>100% auténticos con garantía oficial de fábrica.</p>
-      </div>
-    </div>
-    <div class="feature-item reveal reveal-delay-2">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-      </div>
-      <div class="feature-text">
-        <h4>Envíos a Honduras</h4>
-        <p>Entrega rápida y segura a todo el país.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <footer>
   <div class="footer-inner">
@@ -2304,9 +2379,21 @@ window.addEventListener('scroll', () => {
 // ============================================
 // MOBILE MENU
 // ============================================
-function openMobileMenu() { document.getElementById('mobileMenu').classList.add('open'); }
-function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); }
-document.getElementById('mobileMenuClose').addEventListener('click', closeMobileMenu);
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+
+  menu.classList.remove('open');
+  btn.classList.remove('open');
+}
 
 // ============================================
 // SCROLL REVEAL
@@ -2321,22 +2408,56 @@ function initScrollReveal() {
   }, { threshold: 0.1 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 }
+document.addEventListener('click', (e) => {
+  const dropdown = e.target.closest('.filter-group');
 
+  if (!dropdown) {
+    closeAllFilters();
+  }
+});
+
+// 🔥 extra para móvil
+document.addEventListener('touchstart', (e) => {
+  const dropdown = e.target.closest('.filter-group');
+
+  if (!dropdown) {
+    closeAllFilters();
+  }
+});
+
+function closeAllFilters() {
+  document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('open'));
+}
+document.querySelectorAll('.filter-dropdown').forEach(dd => {
+  dd.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  dd.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+  });
+});
 // ============================================
 // FILTERS
 // ============================================
 function toggleDropdown(id, btn) {
   const dd = document.getElementById(id);
-  const allDropdowns = document.querySelectorAll('.filter-dropdown');
-  const allBtns = document.querySelectorAll('.filter-btn');
-  allDropdowns.forEach(d => { if (d.id !== id) d.classList.remove('open'); });
-  allBtns.forEach(b => { if (b !== btn) b.classList.remove('open'); });
-  dd.classList.toggle('open');
-  btn.classList.toggle('open');
+  const isOpen = dd.classList.contains('open');
+
+  document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('open'));
+
+  if (!isOpen) {
+    dd.classList.add('open');
+    btn.classList.add('open');
+  }
 }
 
-document.addEventListener('click', e => {
-  if (!e.target.closest('.filter-group')) {
+document.addEventListener('click', (e) => {
+  const isInside = e.target.closest('.filter-group');
+
+  if (!isInside) {
     document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('open'));
   }
@@ -2394,7 +2515,20 @@ function renderActiveFilterChips() {
 function addChip(container, label, removeFn) {
   const chip = document.createElement('div');
   chip.className = 'filter-chip';
-  chip.innerHTML = `<span>${label}</span><button onclick="(${removeFn.toString()})()">✕</button>`;
+
+  const span = document.createElement('span');
+  span.textContent = label;
+
+  const btn = document.createElement('button');
+  btn.textContent = '✕';
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation(); // 🔥 evita bugs
+    removeFn();
+  });
+
+  chip.appendChild(span);
+  chip.appendChild(btn);
   container.appendChild(chip);
 }
 
@@ -2478,7 +2612,6 @@ function createCard(w, i) {
     <div class="card-body">
       <p class="card-brand">${w.brand}</p>
       <h3 class="card-name">${w.name}</h3>
-      <p class="card-type">${w.subtitle}</p>
       <div class="card-footer">
         <div>
           <span class="card-price">L. ${w.price.toLocaleString()}</span>${oldPriceHtml}
